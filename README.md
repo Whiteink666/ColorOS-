@@ -1,10 +1,12 @@
-# ColorOS 流体云常驻
+# 安卓实况窗 (Android Live Window)
 
 [![Android](https://img.shields.io/badge/Android-8.0%2B-brightgreen)](https://developer.android.com)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.0.21-blue)](https://kotlinlang.org)
 [![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
 
-让任意自定义内容常驻显示在 **ColorOS 16** 的流体云胶囊中。
+让任意自定义内容常驻显示在 **ColorOS 16** 的实况窗胶囊中。
+
+> Android Live Window — 利用 Android 16 标准 API，将自定义内容持久化锁在系统实况窗胶囊上。
 
 <p align="center">
   <img src="screenshots/preview.png" width="260" alt="预览"/>
@@ -18,17 +20,18 @@
 - 📋 **快速模板**：一键切换音乐、计时器、快递、导航等场景
 - 👁️ **实时预览**：编辑内容时即时预览胶囊效果
 - 🔄 **持久常驻**：AlarmManager 心跳保活，通知丢失自动恢复
-- 📡 **状态感知**：反射检测 ColorOS 是否真正启用了流体云显示
-- 🚀 **开机自启**：支持开机自动恢复流体云显示
+- 📡 **状态感知**：反射检测 ColorOS 是否真正启用了实况窗显示
+- 🚀 **开机自启**：支持开机自动恢复实况窗显示
 - 🎯 **可预测式返回**：Android 14+ 返回手势过渡动画
 - 🔔 **无白圈**：不使用 `startForeground()`，避免锁屏白圈问题
 
 ## 运行截图
+
 | 首页 | 自定义内容 | 关于页面 |
 |------|------------|----------|
 | ![](screenshots/main.png) | ![](screenshots/edit.png) | ![](screenshots/about.png) |
 
-| 流体云胶囊 | 通知栏展开 |
+| 实况窗胶囊 | 通知栏展开 |
 |------------|------------|
 | ![](screenshots/capsule.png) | ![](screenshots/notification.png) |
 
@@ -46,7 +49,7 @@
 
 ## 实现原理
 
-利用 Android 16 新增的 `setRequestPromotedOngoing(true)` API 标记通知，ColorOS 16 识别到该标记后自动将常驻通知提升到流体云胶囊。通知通过 `NotificationManager.notify()` 直接发送（**不使用** `startForeground()`，避免白圈问题），AlarmManager 10ms 循环 tick 实现通知丢失自动恢复。
+利用 Android 16 新增的 `setRequestPromotedOngoing(true)` API 标记实时通知，应用启动通知权限和实时通知后小退应用到后台会自动将应用通知变成实况窗/灵动岛样式显示。通知通过 `NotificationManager.notify()` 直接发送（**不使用** `startForeground()`，避免白圈问题），AlarmManager 10ms 循环 tick 实现通知丢失自动恢复。
 
 > 更详细的技术分析见 App 内「关于」页面。
 
@@ -55,7 +58,7 @@
 | 权限 | 用途 |
 |------|------|
 | `POST_NOTIFICATIONS` | 发送通知（Android 13+ 运行时申请） |
-| `POST_PROMOTED_NOTIFICATIONS` | 允许通知进入流体云 |
+| `POST_PROMOTED_NOTIFICATIONS` | 允许通知进入实况窗 |
 | `FOREGROUND_SERVICE` | 前台服务（手动启动时） |
 | `SCHEDULE_EXACT_ALARM` | AlarmManager 精确闹钟保活 |
 | `RECEIVE_BOOT_COMPLETED` | 开机自启 |
@@ -79,19 +82,19 @@ adb install app/build/outputs/apk/debug/app-debug.apk
 
 ## FAQ
 
-### Q: 为什么流体云不显示？
+### Q: 为什么实况窗不显示？
 **A:** 请逐一检查：
 1. 确认手机是 **ColorOS 16**（基于 Android 16）
 2. 确保通知权限已授予
-3. 检查系统设置中「流体云」通知渠道是否被关闭
-4. 尝试重启应用后重新点击「启动流体云」
+3. 检查系统设置中「安卓实况窗」通知渠道是否被关闭
+4. 尝试重启应用后重新点击「启动实况窗」
 5. 部分机型可能需要等待 3-5 秒后 ColorOS 才会识别
 
 ### Q: 通知栏出现白色圆圈闪烁？
 **A:** 这是调用 `startForeground()` 的副作用。本 App 已避免此问题（直接使用 `NotificationManager.notify()`），如果仍然出现，请检查是否有其他应用同时占用了前台服务。
 
 ### Q: 支持非 ColorOS 手机吗？
-**A:** `setRequestPromotedOngoing()` 是标准 Android API，但流体云胶囊显示是 ColorOS 的系统行为。在其他 ROM 上，通知会以普通常驻通知的形式显示在通知栏，但不会进入任何胶囊。
+**A:** `setRequestPromotedOngoing()` 是标准 Android API，但实况窗胶囊显示是 ColorOS 的系统行为。在其他 ROM 上，通知会以普通常驻通知的形式显示在通知栏，但不会进入任何胶囊。
 
 ### Q: 应用会被系统杀死吗？通知会消失吗？
 **A:** 即使 App 进程被系统杀死，通知仍然独立存在于通知栏。AlarmManager 的 10ms tick 会定期唤醒服务检查通知状态，一旦发现丢失会自动补发。
@@ -105,11 +108,11 @@ adb install app/build/outputs/apk/debug/app-debug.apk
 - 🔋 电池优化 → 不优化
 - 🚫 后台管理 → 允许后台运行
 
-### Q: 可以同时显示多个流体云吗？
-**A:** ColorOS 流体云同一时间只显示一个胶囊。如果系统应用（如音乐、计时器）也在使用流体云，可能会互相抢占。建议关闭系统自带的相关流体云功能。
+### Q: 可以同时显示多个实况窗吗？
+**A:** ColorOS 实况窗同一时间只显示一个胶囊。如果系统应用（如音乐、计时器）也在使用实况窗，可能会互相抢占。建议关闭系统自带的相关实况窗功能。
 
 ### Q: 是否兼容 Android 15 及以下？
-**A:** `minSdk 26`，最低支持 Android 8.0。但在 Android 15 及以下系统中，`setRequestPromotedOngoing()` 不会触发流体云效果（因为该功能仅在 ColorOS 16 提供）。
+**A:** `minSdk 26`，最低支持 Android 8.0。但在 Android 15 及以下系统中，`setRequestPromotedOngoing()` 不会触发实况窗效果（因该功能仅 ColorOS 16 提供）。
 
 ## 开源协议与署名规范
 
@@ -134,10 +137,6 @@ adb install app/build/outputs/apk/debug/app-debug.apk
 详见项目根目录 [LICENSE](LICENSE) 文件。
 
 ---
-
-## 致谢
-
-本项目实现原理参考了开源项目 [quan-naijun/fluid-cloud](https://gitee.com/quan-naijun/fluid-cloud)。
 
 ## 作者
 
